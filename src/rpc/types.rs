@@ -85,13 +85,13 @@ pub mod syncing {
         starting_block: H256,
         #[serde_as(as = "H256AsRelaxedHexStr")]
         current_block: H256,
-        highest_block: HighestBlock,
+        highest_block: BlockStatus,
     }
 
     /// Represents highest block status.
     #[derive(Copy, Clone, Debug, Deserialize, Serialize, PartialEq)]
     #[serde(deny_unknown_fields)]
-    pub enum HighestBlock {
+    pub enum BlockStatus {
         #[serde(rename = "PENDING")]
         Pending,
         #[serde(rename = "PROVEN")]
