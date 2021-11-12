@@ -2,7 +2,7 @@
 use crate::{
     rpc::{
         rpc_trait::RpcApiServer,
-        types::{relaxed, BlockHashOrTag, BlockNumberOrTag, Syncing},
+        types::{out::Syncing, relaxed, BlockHashOrTag, BlockNumberOrTag},
     },
     sequencer::{reply, request::Call, Client},
 };

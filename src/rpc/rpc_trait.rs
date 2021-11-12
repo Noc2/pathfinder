@@ -4,7 +4,7 @@
 //! The methods are taken from [the Starknet operator API spec](https://github.com/starkware-libs/starknet-adrs/blob/master/api/starknet_operator_api_openrpc.json).
 //! Any extensions to the above spec are explicitly marked in the documentation.
 use crate::{
-    rpc::types::{relaxed, BlockHashOrTag, BlockNumberOrTag, Syncing},
+    rpc::types::{out::Syncing, relaxed, BlockHashOrTag, BlockNumberOrTag},
     sequencer::{reply, request::Call},
 };
 use jsonrpsee::{proc_macros::rpc, types::error::Error};
