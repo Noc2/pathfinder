@@ -79,6 +79,8 @@ mod tests {
     mod get_block_by_number {
         use super::*;
         use crate::rpc::types::{BlockNumberOrTag, Tag};
+        use assert_matches::assert_matches;
+        use pretty_assertions::assert_eq;
 
         #[tokio::test]
         async fn latest() {
@@ -109,6 +111,21 @@ mod tests {
                 .get_block_by_number(BlockNumberOrTag::Number(U256::zero()))
                 .await
                 .unwrap();
+        }
+
+        #[tokio::test]
+        async fn invalid_number() {
+            let (srv, addr) = build_server();
+            spawn_server(srv).await;
+            assert_matches!(
+                client(addr)
+                    .get_block_by_number(BlockNumberOrTag::Number(U256::max_value()))
+                    .await
+                    .unwrap_err(),
+                Error::Request(s) => {
+                    assert_eq!(s, r#"{"jsonrpc":"2.0","error":{"code":-32025,"message":"Invalid block number"},"id":0}"#.to_owned())
+                }
+            );
         }
     }
 
