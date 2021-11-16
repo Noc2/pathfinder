@@ -165,6 +165,8 @@ mod tests {
     mod get_storage_at {
         use super::*;
         use crate::rpc::types::{BlockHashOrTag, Tag};
+        use assert_matches::assert_matches;
+        use pretty_assertions::assert_eq;
         use web3::types::H256;
 
         #[tokio::test]
@@ -202,6 +204,52 @@ mod tests {
                 )
                 .await
                 .unwrap();
+        }
+
+        #[tokio::test]
+        async fn contract_not_found() {
+            let (srv, addr) = build_server();
+            spawn_server(srv).await;
+            assert_matches!(
+                client(addr)
+                .get_storage_at(
+                    *INVALID_CONTRACT_ADDR,
+                    H256::from_str(
+                        "0x0206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091",
+                    )
+                    .unwrap()
+                    .into(),
+                    BlockHashOrTag::Tag(Tag::Latest),
+                )
+                .await
+                .unwrap_err(),
+                Error::Request(s) => {
+                    assert_eq!(s, r#"{"jsonrpc":"2.0","error":{"code":-32020,"message":"Contract not found"},"id":0}"#.to_owned())
+                }
+            );
+        }
+
+        #[tokio::test]
+        async fn invalid_storage_key() {
+            let (srv, addr) = build_server();
+            spawn_server(srv).await;
+            assert_matches!(
+                client(addr)
+                .get_storage_at(
+                    *INVALID_CONTRACT_ADDR,
+                    H256::from_str(
+                        "0x1206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091",
+                    )
+                    .unwrap()
+                    .into(),
+                    BlockHashOrTag::Tag(Tag::Latest),
+                )
+                .await
+                .unwrap_err(),
+                Error::Request(s) => {
+                    assert_eq!(s, r#"{"jsonrpc":"2.0","error":{"code":-32023,"message":"Invalid storage key"},"id":0}"#.to_owned())
+                }
+            );
         }
     }
 
