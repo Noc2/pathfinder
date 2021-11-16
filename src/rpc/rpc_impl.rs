@@ -51,7 +51,7 @@ impl RpcApiServer for RpcImpl {
                         if starknet_e.code == reply::starknet::ErrorCode::BlockNotFound =>
                     {
                         Error::Call(CallError::Custom {
-                            code: crate::rpc::types::out::ErrorCode::InalidBlockNumber as i32,
+                            code: crate::rpc::types::out::ErrorCode::InvalidBlockNumber as i32,
                             message: "Invalid block number".to_owned(),
                             data: None,
                         })
@@ -89,7 +89,29 @@ impl RpcApiServer for RpcImpl {
         let storage = self
             .0
             .storage(*contract_address, key.into(), block_id)
-            .await?;
+            .await
+            .map_err(|e| match e.downcast_ref::<reply::starknet::Error>() {
+                Some(starknet_e) => match starknet_e.code {
+                    // TODO reply::starknet::ErrorCode::UninitializedContract
+                    // probably does not fall into this category
+                    reply::starknet::ErrorCode::OutOfRangeContractAddress => {
+                        Error::Call(CallError::Custom {
+                            code: crate::rpc::types::out::ErrorCode::ContractNotFound as i32,
+                            message: "Contract not found".to_owned(),
+                            data: None,
+                        })
+                    }
+                    reply::starknet::ErrorCode::OutOfRangeStorageKey => {
+                        Error::Call(CallError::Custom {
+                            code: crate::rpc::types::out::ErrorCode::InvaldStorageKey as i32,
+                            message: "Invalid storage key".to_owned(),
+                            data: None,
+                        })
+                    }
+                    _ => e.into(),
+                },
+                None => e.into(),
+            })?;
         let x: [u8; 32] = storage.into();
         Ok(H256::from(x).into())
     }

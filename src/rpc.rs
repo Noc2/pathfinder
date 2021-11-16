@@ -17,7 +17,7 @@ pub async fn run_server(addr: SocketAddr) -> Result<(), Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::rpc::rpc_trait::RpcApiClient;
+    use crate::rpc::{rpc_trait::RpcApiClient, types::relaxed};
     use jsonrpsee::{
         http_client::{HttpClient, HttpClientBuilder},
         http_server::{HttpServer, HttpServerBuilder},
@@ -27,6 +27,11 @@ mod tests {
         str::FromStr,
     };
     use web3::types::{H256, U256};
+
+    lazy_static::lazy_static! {
+        static ref VALID_CONTRACT_ADDR: relaxed::H256 = H256::from_str("0x04c988a22c691166946fdcfcd1608518333065e6deb1519d5d5f8def8b6c3e78").unwrap().into();
+        static ref INVALID_CONTRACT_ADDR: relaxed::H256 = H256::from_str("0x14c988a22c691166946fdcfcd1608518333065e6deb1519d5d5f8def8b6c3e78").unwrap().into();
+    }
 
     /// Helper rpc client
     fn client(addr: SocketAddr) -> HttpClient {
@@ -168,11 +173,7 @@ mod tests {
             spawn_server(srv).await;
             client(addr)
                 .get_storage_at(
-                    H256::from_str(
-                        "0x04c988a22c691166946fdcfcd1608518333065e6deb1519d5d5f8def8b6c3e78",
-                    )
-                    .unwrap()
-                    .into(),
+                    *VALID_CONTRACT_ADDR,
                     H256::from_str(
                         "0x0206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091",
                     )
@@ -191,11 +192,7 @@ mod tests {
             spawn_server(srv).await;
             client(addr)
                 .get_storage_at(
-                    H256::from_str(
-                        "0x4c988a22c691166946fdcfcd1608518333065e6deb1519d5d5f8def8b6c3e78",
-                    )
-                    .unwrap()
-                    .into(),
+                    *VALID_CONTRACT_ADDR,
                     H256::from_str(
                         "0x206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091",
                     )
@@ -219,11 +216,7 @@ mod tests {
             spawn_server(srv).await;
             client(addr)
                 .get_storage_at_by_block_number(
-                    H256::from_str(
-                        "0x04c988a22c691166946fdcfcd1608518333065e6deb1519d5d5f8def8b6c3e78",
-                    )
-                    .unwrap()
-                    .into(),
+                    *VALID_CONTRACT_ADDR,
                     H256::from_str(
                         "0x0206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091",
                     )
@@ -241,11 +234,7 @@ mod tests {
             spawn_server(srv).await;
             client(addr)
                 .get_storage_at_by_block_number(
-                    H256::from_str(
-                        "0x04c988a22c691166946fdcfcd1608518333065e6deb1519d5d5f8def8b6c3e78",
-                    )
-                    .unwrap()
-                    .into(),
+                    *VALID_CONTRACT_ADDR,
                     H256::from_str(
                         "0x0206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091",
                     )
@@ -358,16 +347,7 @@ mod tests {
     async fn get_code() {
         let (srv, addr) = build_server();
         spawn_server(srv).await;
-        client(addr)
-            .get_code(
-                H256::from_str(
-                    "0x04c988a22c691166946fdcfcd1608518333065e6deb1519d5d5f8def8b6c3e78",
-                )
-                .unwrap()
-                .into(),
-            )
-            .await
-            .unwrap();
+        client(addr).get_code(*VALID_CONTRACT_ADDR).await.unwrap();
     }
 
     mod get_block_transaction_count_by_hash {
@@ -439,10 +419,7 @@ mod tests {
                 .call(
                     Call {
                         calldata: vec![U256::from(1234)],
-                        contract_address: H256::from_str(
-                            "0x04c988a22c691166946fdcfcd1608518333065e6deb1519d5d5f8def8b6c3e78",
-                        )
-                        .unwrap(),
+                        contract_address: **VALID_CONTRACT_ADDR,
                         entry_point_selector: H256::from_str(
                             "0x0362398bec32bc0ebb411203221a35a0301193a96f317ebe5e40be9f60d15320",
                         )
@@ -464,10 +441,7 @@ mod tests {
                 .call(
                     Call {
                         calldata: vec![U256::from(1234)],
-                        contract_address: H256::from_str(
-                            "0x04c988a22c691166946fdcfcd1608518333065e6deb1519d5d5f8def8b6c3e78",
-                        )
-                        .unwrap(),
+                        contract_address: **VALID_CONTRACT_ADDR,
                         entry_point_selector: H256::from_str(
                             "0x0362398bec32bc0ebb411203221a35a0301193a96f317ebe5e40be9f60d15320",
                         )

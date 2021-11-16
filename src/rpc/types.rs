@@ -41,7 +41,7 @@ pub mod relaxed {
     use web3::types;
 
     #[serde_as]
-    #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+    #[derive(Copy, Clone, Debug, Deserialize, Serialize, PartialEq)]
     pub struct H256(#[serde_as(as = "H256AsRelaxedHexStr")] types::H256);
 
     impl From<types::H256> for H256 {
@@ -135,7 +135,9 @@ pub mod out {
     /// Starkware specific RPC error codes.
     #[derive(Copy, Clone, Debug, PartialEq)]
     pub enum ErrorCode {
-        InalidBlockNumber = -32025,
+        ContractNotFound = -32020,
+        InvaldStorageKey = -32023,
+        InvalidBlockNumber = -32025,
     }
 
     /// L2 state update as returned by the RPC API.
