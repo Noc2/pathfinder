@@ -31,6 +31,8 @@ mod tests {
     lazy_static::lazy_static! {
         static ref VALID_CONTRACT_ADDR: relaxed::H256 = H256::from_str("0x04c988a22c691166946fdcfcd1608518333065e6deb1519d5d5f8def8b6c3e78").unwrap().into();
         static ref INVALID_CONTRACT_ADDR: relaxed::H256 = H256::from_str("0x14c988a22c691166946fdcfcd1608518333065e6deb1519d5d5f8def8b6c3e78").unwrap().into();
+        static ref VALID_KEY: relaxed::H256 = H256::from_str("0x0206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091").unwrap().into();
+        static ref INVALID_KEY: relaxed::H256 = H256::from_str("0x1206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091").unwrap().into();
     }
 
     /// Helper rpc client
@@ -176,11 +178,7 @@ mod tests {
             client(addr)
                 .get_storage_at(
                     *VALID_CONTRACT_ADDR,
-                    H256::from_str(
-                        "0x0206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091",
-                    )
-                    .unwrap()
-                    .into(),
+                    *VALID_KEY,
                     BlockHashOrTag::Tag(Tag::Latest),
                 )
                 .await
@@ -195,11 +193,7 @@ mod tests {
             client(addr)
                 .get_storage_at(
                     *VALID_CONTRACT_ADDR,
-                    H256::from_str(
-                        "0x206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091",
-                    )
-                    .unwrap()
-                    .into(),
+                    *VALID_KEY,
                     BlockHashOrTag::Hash(H256::zero() /*TODO hash for block 5272*/),
                 )
                 .await
@@ -214,11 +208,7 @@ mod tests {
                 client(addr)
                 .get_storage_at(
                     *INVALID_CONTRACT_ADDR,
-                    H256::from_str(
-                        "0x0206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091",
-                    )
-                    .unwrap()
-                    .into(),
+                    *VALID_KEY,
                     BlockHashOrTag::Tag(Tag::Latest),
                 )
                 .await
@@ -237,11 +227,7 @@ mod tests {
                 client(addr)
                 .get_storage_at(
                     *INVALID_CONTRACT_ADDR,
-                    H256::from_str(
-                        "0x1206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091",
-                    )
-                    .unwrap()
-                    .into(),
+                    *INVALID_KEY,
                     BlockHashOrTag::Tag(Tag::Latest),
                 )
                 .await
@@ -256,7 +242,6 @@ mod tests {
     mod get_storage_at_by_block_number {
         use super::*;
         use crate::rpc::types::{BlockNumberOrTag, Tag};
-        use web3::types::H256;
 
         #[tokio::test]
         async fn latest() {
@@ -265,11 +250,7 @@ mod tests {
             client(addr)
                 .get_storage_at_by_block_number(
                     *VALID_CONTRACT_ADDR,
-                    H256::from_str(
-                        "0x0206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091",
-                    )
-                    .unwrap()
-                    .into(),
+                    *VALID_KEY,
                     BlockNumberOrTag::Tag(Tag::Latest),
                 )
                 .await
@@ -283,11 +264,7 @@ mod tests {
             client(addr)
                 .get_storage_at_by_block_number(
                     *VALID_CONTRACT_ADDR,
-                    H256::from_str(
-                        "0x0206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091",
-                    )
-                    .unwrap()
-                    .into(),
+                    *VALID_KEY,
                     BlockNumberOrTag::Number(U256::from(5272)),
                 )
                 .await
